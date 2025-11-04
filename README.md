@@ -86,8 +86,9 @@ Here’s a step-by-step guide to check if logs are being sent from Wazuh agents 
      ```
      /var/ossec/etc/ossec.conf
      ```
-   - Ensure the `<localfile>` blocks are configured to monitor the desired log files. For example:
-     ```xml
+   - Ensure the `<localfile>` blocks are configured to monitor the desired log files.
+   - For example: xml
+     ```
      <localfile>
          <location>/var/log/syslog</location>
          <log_format>syslog</log_format>
@@ -106,7 +107,7 @@ Here’s a step-by-step guide to check if logs are being sent from Wazuh agents 
 
 ### 4. **Restart the Agent**:
    - Restart the Wazuh agent to apply the configuration:
-     ```bash
+     ```
      sudo systemctl restart wazuh-agent
      ```
 
@@ -118,8 +119,8 @@ Here’s a step-by-step guide to check if logs are being sent from Wazuh agents 
      C:\Program Files (x86)\ossec-agent\ossec.conf
      ```
    - Ensure the `<localfile>` blocks are correctly configured to monitor the desired log files or event channels. For example:
-     ```xml
-     <localfile>
+     ```
+	 <localfile>
          <location>Microsoft-Windows-Security-Auditing</location>
          <log_format>eventchannel</log_format>
      </localfile>
@@ -136,8 +137,8 @@ Here’s a step-by-step guide to check if logs are being sent from Wazuh agents 
    - Generate a test event, such as creating a new file or triggering a security event, and check if it appears in the agent logs.
 
 ### 4. **Restart the Agent**:
-   - Restart the Wazuh agent to ensure the configuration is applied:
-     ```powershell
+   - Restart the Wazuh agent to ensure the configuration is applied:powershell
+     ```
      Restart-Service -Name wazuh
      ```
 
@@ -253,16 +254,22 @@ This rule helps Wazuh detect when sensitive tools like ncat, tcpdump, or netcat 
 
 ---
 
-## 4.5 Making rules to detect applications run orsudo operation examples
+## 4.5 Making rules to detect applications run or sudo operation examples
 
 ### 1. Create audit rules
 Append these lines to your audit rules file (e.g., /etc/audit/rules.d/audit.rules):
-bash
-# Monitor execution of tcpdump
+
+
+#### Monitor execution of tcpdump
+
 -a always,exit -F path=/usr/sbin/tcpdump -F perm=x -F auid>=1000 -F auid!=4294967295 -k exec_tcpdump
-# Monitor execution of netcat (nc)
+
+#### Monitor execution of netcat (nc)
+
 -a always,exit -F path=/usr/bin/nc -F perm=x -F auid>=1000 -F auid!=4294967295 -k exec_nc
-# Monitor usage of sudo
+
+#### Monitor usage of sudo
+
 -a always,exit -F path=/usr/bin/sudo -F perm=x -F auid>=1000 -F auid!=4294967295 -k exec_sudo
 > Adjust the paths (/usr/sbin/tcpdump, /usr/bin/nc, /usr/bin/sudo) if they differ on your system. Use which tcpdump etc. to confirm.
 
@@ -272,11 +279,13 @@ sudo augenrules --load
 sudo systemctl restart auditd
 
 ### 3. Verify logging
+
 Run one of the monitored commands, then check the logs:
 
 sudo ausearch -k exec_tcpdump
 sudo ausearch -k exec_nc
 sudo ausearch -k exec_sudo
+
 This setup ensures Wazuh (via auditd) can alert you when these tools are executed—great for catching privilege escalation or lateral movement attempts.
 
 
@@ -285,10 +294,14 @@ This setup ensures Wazuh (via auditd) can alert you when these tools are execute
 
 ## 4.6 Check syslog and Enable syslog collection on wazuh
 Troubleshooting Access to archives.log
+
 ### 1. Check File Existence
 Run:
+
 ls -l /var/ossec/logs/archives/
+
 If archives.log isn’t listed, it may not be created yet—especially if <logall> isn’t enabled or no logs are being archived.
+
 ### 2. Verify Permissions
 Try:
 - sudo ls -l /var/ossec/logs/archives/archives.log
@@ -296,6 +309,7 @@ If the file exists but you still can’t read it, check ownership:
 - stat /var/ossec/logs/archives/archives.log
 
 You may need to run as root or ensure your user is in the ossec group.
+
 ### 3. Enable Archiving
 In /var/ossec/etc/ossec.conf, confirm this block exists:
 ```xml
@@ -317,15 +331,20 @@ You might find archives.log.1, .gz, or other rotated versions.
 ---
 
 ## 4.7 Common Reasons pfSense Logs Don’t Reach Wazuh Manager
+
 ### 1. Remote Logging Misconfiguration
  -  Go to Status → System Logs → Settings → Remote Logging Options
  -  Enable Remote Logging
  -  Set Log Format to BSD
  -  Add your Wazuh Manager’s IP and port (usually 514/UDP)
  -  Check Everything to forward all logs
+
+
 ### 2. Missing Hostname in Syslog Headers
  -  pfSense often omits hostnames in syslog headers, which breaks Wazuh’s pre-decoder
  -  **Workaround:** Use Syslog-ng on pfSense to reformat logs before sending to Wazuh
+
+
 ### 3. Firewall Blocking Port 514
  - On Wazuh Manager, ensure port 514/UDP is open:
 
@@ -357,6 +376,7 @@ And for verbose output with packet details:
 
 To filter traffic by port 514 using tcpdump, you’ll want to specify the protocol and port in your capture expression. Port 514 is commonly used for syslog over UDP or TCP, depending on the setup.
 
+
 ### How to send a basic packet for test purpose
 
 Send TCP packet 
@@ -377,6 +397,7 @@ Send UDP packet
 
 **sudo tcpdump -i eth0 tcp port 514**
 
+
 ### 3. All traffic involving port 514 (TCP or UDP)
 
 sudo tcpdump -i eth0 port 514
@@ -388,6 +409,7 @@ sudo tcpdump -i eth0 port 514
 Or to capture any traffic involving 192.168.0.254 and port 514:
 
 **sudo tcpdump -i eth0 host 192.168.0.254 and port 514**
+
 
 ### Add Verbosity or Save to File
 
