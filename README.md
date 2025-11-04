@@ -63,7 +63,7 @@ Restart-Service -Name wazuh
 
 **Linux:**
 
-**sudo systemctl restart wazuh-agent**
+sudo systemctl restart wazuh-agent
 
 ### 5. Confirm Logs Are Being Sent
 
@@ -233,7 +233,7 @@ Use -f all to apply changes to all agents.
 ### Example: Track All Commands Run as Root
 To monitor every command executed by root users:
 
-**-a exit,always -F arch=b64 -F euid=0 -S execve -k audit-wazuh-c**
+-a exit,always -F arch=b64 -F euid=0 -S execve -k audit-wazuh-c
 
 ### Explanation:
 
@@ -304,26 +304,30 @@ If archives.log isn’t listed, it may not be created yet—especially if <logal
 
 ### 2. Verify Permissions
 Try:
-- sudo ls -l /var/ossec/logs/archives/archives.log
+
+sudo ls -l /var/ossec/logs/archives/archives.log
+
 If the file exists but you still can’t read it, check ownership:
-- stat /var/ossec/logs/archives/archives.log
+
+stat /var/ossec/logs/archives/archives.log
 
 You may need to run as root or ensure your user is in the ossec group.
 
 ### 3. Enable Archiving
 In /var/ossec/etc/ossec.conf, confirm this block exists:
+
 ```xml
 <global>
   <logall>yes</logall>
 </global>
 ```
 **Then restart the manager:**
-**sudo systemctl restart wazuh-manager**
+sudo systemctl restart wazuh-manager
 
 ### 4. Check for Log Rotation
 Sometimes archives.log is rotated and renamed. Try:
 
- - ls /var/ossec/logs/archives/archives.log*
+ls /var/ossec/logs/archives/archives.log*
 
 You might find archives.log.1, .gz, or other rotated versions.
 
@@ -406,7 +410,7 @@ sudo tcpdump -i eth0 port 514
 
 **sudo tcpdump -i eth0 src host 192.168.0.254 and port 514**
 
-Or to capture any traffic involving 192.168.0.254 and port 514:
+ - Or to capture any traffic involving 192.168.0.254 and port 514:
 
 **sudo tcpdump -i eth0 host 192.168.0.254 and port 514**
 
